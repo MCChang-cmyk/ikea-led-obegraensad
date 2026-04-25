@@ -10,7 +10,7 @@
 // Home Assistant 連線設定
 // ==========================================
 const char* haServer = "http://192.168.1.30:8123";
-const char* haToken  = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJmMTc1MzUxNWMzM2E0YWVhOGY5OTg5ZTYzMmQxZjcwMiIsImlhdCI6MTc3MzU1NDIxOSwiZXhwIjoyMDg4OTE0MjE5fQ.kggTQZ3YwHUpF2pkOltfEzsHjor8DFb9PkLXCTutDJU"; 
+const char* haToken  = HA_TOKEN;
 
 // ==========================================
 // CWA 天氣代碼轉換

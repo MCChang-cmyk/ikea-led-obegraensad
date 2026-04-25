@@ -6,6 +6,18 @@
 compile_commands.json
 secrets.h
 
+# 忽略私密設定檔
+secrets.ini
+
+# 忽略 PlatformIO 產生的編譯目錄
+.pio/
+.vscode/
+
+# 忽略作業系統暫存檔
+.DS_Store
+Thumbs.db
+
+
 # Logs
 logs
 *.log
