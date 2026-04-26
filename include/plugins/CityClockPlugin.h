@@ -16,11 +16,8 @@ class CityClockPlugin : public Plugin
 private:
   // Cities configuration
   static constexpr CityInfo cities[] = {
-      {"Taipei", "CST-8", 25.03, 121.56},
-      {"Omsk", "OMST-6", 54.99f, 73.37f},
-      {"Berlin", "CET-1CEST,M3.5.0/2,M10.5.0/3", 52.52f, 13.41f},
-      {"St.Petersburg", "MSK-3", 59.93f, 30.32f}};
-  static constexpr int cityCount = 4;
+      {"Taipei", "CST-8", 25.03, 121.56}};
+  static constexpr int cityCount = 1;
 
   struct tm timeinfo;
   NonBlockingDelay secondTimer;
