@@ -57,13 +57,28 @@ template:
 
 使用 Visual Studio Code + PlatformIO 開啟。
 
-開啟 src/plugins/ForecastPlugin.cpp：
+開啟 `src/plugins/ForecastPlugin.cpp`：
 
-修改 haServer 為你的 Home Assistant IP。
+修改 `haServer` 為你的 Home Assistant IP。
 
-修改 haToken 為你的長期存取權杖。
+在專案根目錄建立 `secrets.ini`，填入你的 Home Assistant 長期存取權杖（`platformio.ini` 會透過 `extra_configs = secrets.ini` 載入）：
 
-(建議) 在 include/ 目錄建立 secrets.h 來管理 Token 並加入 .gitignore 以防洩露。
+```ini
+[tokens]
+ha_token = "YOUR_LONG_LIVED_TOKEN"
+```
+
+`platformio.ini` 會將此值注入 `HA_TOKEN`，`ForecastPlugin.cpp` 內的 `haToken` 會自動使用它。請確認 `secrets.ini` 已加入 `.gitignore`，避免金鑰外洩。
+
+如果你的 Home Assistant 實體名稱和本專案預設不同，請在 `src/plugins/ForecastPlugin.cpp` 的 `entities[]` 清單中改成你的 entity ID。預設對照如下：
+
+- `sensor.opencwa_xin_zhuang_qu_weather_code`：天氣代碼（對應天氣圖示）
+- `sensor.opencwa_xin_zhuang_qu_feels_like_temperature`：體感溫度
+- `sensor.cwa_max_temp`：最高溫（由上方 YAML 範例建立）
+- `sensor.cwa_min_temp`：最低溫（由上方 YAML 範例建立）
+- `sensor.alpstuga_air_quality_monitor_shi_du_2`：濕度
+- `sensor.alpstuga_air_quality_monitor_pm2_5_2`：PM2.5
+- `sensor.alpstuga_air_quality_monitor_er_yang_hua_tan_2`：CO2
 
 編譯並透過 USB 燒錄至 ESP32。
 
