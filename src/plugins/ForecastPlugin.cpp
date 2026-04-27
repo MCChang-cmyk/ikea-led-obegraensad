@@ -138,7 +138,7 @@ void ForecastPlugin::drawWeatherIcon(bool useTomorrow) {
   }
 
   if (icon >= 0 && icon < (int)weatherIcons.size()) {
-    Screen.drawWeather(0, 0, icon, myBrightness);
+    Screen.drawWeather(0, 5, icon, myBrightness);
   }
 }
 
@@ -209,22 +209,18 @@ void ForecastPlugin::loop() {
         if (showNightTrend && hasTomorrowTrend) {
           // 晚間顯示明日趨勢（正數：上箭頭下數值；負數：上數值下箭頭）
           auto drawUpArrowLarge = [&]() {
-            // Centered large up arrow (7x6)
-            Screen.setPixel(7, 0, 1, myBrightness);
-            Screen.setPixel(6, 1, 1, myBrightness); Screen.setPixel(7, 1, 1, myBrightness); Screen.setPixel(8, 1, 1, myBrightness);
-            Screen.setPixel(5, 2, 1, myBrightness); Screen.setPixel(6, 2, 1, myBrightness); Screen.setPixel(7, 2, 1, myBrightness); Screen.setPixel(8, 2, 1, myBrightness); Screen.setPixel(9, 2, 1, myBrightness);
-            Screen.setPixel(7, 3, 1, myBrightness);
-            Screen.setPixel(7, 4, 1, myBrightness);
-            Screen.setPixel(7, 5, 1, myBrightness);
+            // Centered up triangle (height 4px), moved down by 1 pixel
+            Screen.setPixel(7, 1, 1, myBrightness); // Row 0: 1 pixel
+            Screen.setPixel(6, 2, 1, myBrightness); Screen.setPixel(7, 2, 1, myBrightness); Screen.setPixel(8, 2, 1, myBrightness); // Row 1: 3 pixels
+            Screen.setPixel(5, 3, 1, myBrightness); Screen.setPixel(6, 3, 1, myBrightness); Screen.setPixel(7, 3, 1, myBrightness); Screen.setPixel(8, 3, 1, myBrightness); Screen.setPixel(9, 3, 1, myBrightness); // Row 2: 5 pixels
+            Screen.setPixel(4, 4, 1, myBrightness); Screen.setPixel(5, 4, 1, myBrightness); Screen.setPixel(6, 4, 1, myBrightness); Screen.setPixel(7, 4, 1, myBrightness); Screen.setPixel(8, 4, 1, myBrightness); Screen.setPixel(9, 4, 1, myBrightness); Screen.setPixel(10, 4, 1, myBrightness); // Row 3: 7 pixels
           };
           auto drawDownArrowLarge = [&]() {
-            // Centered large down arrow (7x6) moved up by one pixel
-            Screen.setPixel(7, 9, 1, myBrightness);
-            Screen.setPixel(7, 10, 1, myBrightness);
-            Screen.setPixel(7, 11, 1, myBrightness);
-            Screen.setPixel(5, 12, 1, myBrightness); Screen.setPixel(6, 12, 1, myBrightness); Screen.setPixel(7, 12, 1, myBrightness); Screen.setPixel(8, 12, 1, myBrightness); Screen.setPixel(9, 12, 1, myBrightness);
-            Screen.setPixel(6, 13, 1, myBrightness); Screen.setPixel(7, 13, 1, myBrightness); Screen.setPixel(8, 13, 1, myBrightness);
-            Screen.setPixel(7, 14, 1, myBrightness);
+            // Centered down triangle (height 4px), moved up by 1 pixel
+            Screen.setPixel(4, 10, 1, myBrightness); Screen.setPixel(5, 10, 1, myBrightness); Screen.setPixel(6, 10, 1, myBrightness); Screen.setPixel(7, 10, 1, myBrightness); Screen.setPixel(8, 10, 1, myBrightness); Screen.setPixel(9, 10, 1, myBrightness); Screen.setPixel(10, 10, 1, myBrightness); // Row 0: 7 pixels
+            Screen.setPixel(5, 11, 1, myBrightness); Screen.setPixel(6, 11, 1, myBrightness); Screen.setPixel(7, 11, 1, myBrightness); Screen.setPixel(8, 11, 1, myBrightness); Screen.setPixel(9, 11, 1, myBrightness); // Row 1: 5 pixels
+            Screen.setPixel(6, 12, 1, myBrightness); Screen.setPixel(7, 12, 1, myBrightness); Screen.setPixel(8, 12, 1, myBrightness); // Row 2: 3 pixels
+            Screen.setPixel(7, 13, 1, myBrightness); // Row 3: 1 pixel
           };
 
           if (tomorrowTrend > 0) {
