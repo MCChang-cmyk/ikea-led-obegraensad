@@ -10,7 +10,7 @@ private:
   // 數據儲存
   int maxTemp = -99;
   int minTemp = -99;
-  int tomorrowTrend = 0;
+  float tomorrowTrend = 0.0f;
   bool hasTomorrowTrend = false;
   int weatherIcon = -1;
   float haFeelsLike = -99.0f;
@@ -20,6 +20,8 @@ private:
   float haPM25 = 0.0f;
   float haCO2 = 0.0f;          // 新增 CO2 變數
   bool showAQIWarning = false;
+  int tomorrowWeatherIcon = -1;
+  bool hasTomorrowWeatherIcon = false;
   
   // 顯示控制
   int displayMode = 1;
@@ -39,6 +41,8 @@ private:
   void fetchHAData();
   void drawInternalClock();
   void drawTempValue(int temp, int y);
+  void drawTrendOneDecimal(float value, int y);
+  void drawWeatherIcon(bool useTomorrow);
   int mapCwaCode(int code);
   void loadNightWindowConfig();
 

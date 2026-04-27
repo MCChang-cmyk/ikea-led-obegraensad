@@ -56,13 +56,14 @@ void ForecastPlugin::fetchHAData() {
     "sensor.alpstuga_air_quality_monitor_pm2_5_2",
     "sensor.alpstuga_air_quality_monitor_er_yang_hua_tan_2",
     "sensor.tomorrow_avg_temp_trend",
-    "sensor.ming_ri_qi_wen_qu_shi"
+    "sensor.ming_ri_qi_wen_qu_shi",
+    "sensor.opencwa_xin_zhuang_qu_tomorrow_weather_code"
   };
 
   bool trendUpdated = false;
-  int newTrend = tomorrowTrend;
+  float newTrend = tomorrowTrend;
 
-  for (int i = 0; i < 9; i++) {
+  for (int i = 0; i < 10; i++) {
     String url = String(haServer) + "/api/states/" + String(entities[i]);
     http.begin(client, url);
     http.addHeader("Authorization", "Bearer " + String(haToken));
@@ -81,7 +82,8 @@ void ForecastPlugin::fetchHAData() {
         if (i == 4) haHumidity = state.toFloat();
         if (i == 5) haPM25 = state.toFloat();
         if (i == 6) haCO2 = state.toFloat();
-        if (i == 7 || i == 8) { newTrend = (int)roundf(state.toFloat()); trendUpdated = true; }
+        if (i == 7 || i == 8) { newTrend = state.toFloat(); trendUpdated = true; }
+        if (i == 9) { tomorrowWeatherIcon = mapCwaCode(state.toInt()); hasTomorrowWeatherIcon = true; }
         
         // 警告邏輯：PM2.5 > 35 或 CO2 > 1000
         showAQIWarning = (haPM25 > 35.0f || haCO2 > 1000.0f);
@@ -113,6 +115,30 @@ void ForecastPlugin::drawTempValue(int val, int y) {
   } else {
     if (val < 0) Screen.setPixel(6, y + 2, 1, myBrightness);
     Screen.drawNumbers(8, y, {absV});
+  }
+}
+
+void ForecastPlugin::drawTrendOneDecimal(float value, int y) {
+  int rounded = (int)roundf(fabsf(value));
+  if (rounded > 99) rounded = 99; // guard for screen width
+
+  if (rounded < 10) {
+    // Display single digit, shifted left for better alignment with arrows
+    Screen.drawCharacter(1, y, Screen.readBytes(bigNumbers[rounded]), 8, myBrightness);
+  } else {
+    // Display two digits (rare case)
+    Screen.drawNumbers(0, y, {rounded / 10, rounded % 10});
+  }
+}
+
+void ForecastPlugin::drawWeatherIcon(bool useTomorrow) {
+  int icon = weatherIcon;
+  if (useTomorrow && hasTomorrowWeatherIcon) {
+    icon = tomorrowWeatherIcon;
+  }
+
+  if (icon >= 0 && icon < (int)weatherIcons.size()) {
+    Screen.drawWeather(0, 0, icon, myBrightness);
   }
 }
 
@@ -175,25 +201,47 @@ void ForecastPlugin::loop() {
       if (displayTimer.isReady(1000)) {
         static unsigned long lastDebugPrint = 0;
         if (millis() - lastDebugPrint > 30000UL) {
-          Serial.printf("[ForecastPlugin] hour=%d night=%d range=%d~%d hasTrend=%d trend=%d\n",
+          Serial.printf("[ForecastPlugin] hour=%d night=%d range=%d~%d hasTrend=%d trend=%.1f\n",
                         currentHour, showNightTrend, nightStartHour, nightEndHour, hasTomorrowTrend, tomorrowTrend);
           lastDebugPrint = millis();
         }
         Screen.clear();
         if (showNightTrend && hasTomorrowTrend) {
-          // 晚間顯示明日趨勢：上升/下降/持平 + 差值
+          // 晚間顯示明日趨勢（正數：上箭頭下數值；負數：上數值下箭頭）
+          auto drawUpArrowLarge = [&]() {
+            // Centered large up arrow (7x6)
+            Screen.setPixel(7, 0, 1, myBrightness);
+            Screen.setPixel(6, 1, 1, myBrightness); Screen.setPixel(7, 1, 1, myBrightness); Screen.setPixel(8, 1, 1, myBrightness);
+            Screen.setPixel(5, 2, 1, myBrightness); Screen.setPixel(6, 2, 1, myBrightness); Screen.setPixel(7, 2, 1, myBrightness); Screen.setPixel(8, 2, 1, myBrightness); Screen.setPixel(9, 2, 1, myBrightness);
+            Screen.setPixel(7, 3, 1, myBrightness);
+            Screen.setPixel(7, 4, 1, myBrightness);
+            Screen.setPixel(7, 5, 1, myBrightness);
+          };
+          auto drawDownArrowLarge = [&]() {
+            // Centered large down arrow (7x6) moved up by one pixel
+            Screen.setPixel(7, 9, 1, myBrightness);
+            Screen.setPixel(7, 10, 1, myBrightness);
+            Screen.setPixel(7, 11, 1, myBrightness);
+            Screen.setPixel(5, 12, 1, myBrightness); Screen.setPixel(6, 12, 1, myBrightness); Screen.setPixel(7, 12, 1, myBrightness); Screen.setPixel(8, 12, 1, myBrightness); Screen.setPixel(9, 12, 1, myBrightness);
+            Screen.setPixel(6, 13, 1, myBrightness); Screen.setPixel(7, 13, 1, myBrightness); Screen.setPixel(8, 13, 1, myBrightness);
+            Screen.setPixel(7, 14, 1, myBrightness);
+          };
+
           if (tomorrowTrend > 0) {
-            Screen.setPixel(2, 4, 1, myBrightness);
-            Screen.setPixel(1, 5, 1, myBrightness); Screen.setPixel(2, 5, 1, myBrightness); Screen.setPixel(3, 5, 1, myBrightness);
-            Screen.setPixel(2, 6, 1, myBrightness); Screen.setPixel(2, 7, 1, myBrightness);
+            // 上方箭頭
+            drawUpArrowLarge();
+            // 下方顯示絕對值（含小數點一位）
+            drawTrendOneDecimal(tomorrowTrend, 8);
           } else if (tomorrowTrend < 0) {
-            Screen.setPixel(2, 4, 1, myBrightness); Screen.setPixel(2, 5, 1, myBrightness);
-            Screen.setPixel(1, 6, 1, myBrightness); Screen.setPixel(2, 6, 1, myBrightness); Screen.setPixel(3, 6, 1, myBrightness);
-            Screen.setPixel(2, 7, 1, myBrightness);
+            // 上方顯示絕對值（不顯示負號，含小數點一位）
+            drawTrendOneDecimal(tomorrowTrend, 0);
+            // 下方箭頭
+            drawDownArrowLarge();
           } else {
-            Screen.setPixel(1, 5, 1, myBrightness); Screen.setPixel(2, 5, 1, myBrightness); Screen.setPixel(3, 5, 1, myBrightness);
+            // 持平：置中短橫 + 下方顯示 0.0
+            Screen.setPixel(5, 3, 1, myBrightness); Screen.setPixel(6, 3, 1, myBrightness); Screen.setPixel(7, 3, 1, myBrightness); Screen.setPixel(8, 3, 1, myBrightness); Screen.setPixel(9, 3, 1, myBrightness);
+            drawTrendOneDecimal(tomorrowTrend, 8);
           }
-          drawTempValue(tomorrowTrend, 4);
         } else {
           // 白天顯示今日高低溫
           Screen.setPixel(2, 1, 1, myBrightness);
@@ -207,12 +255,21 @@ void ForecastPlugin::loop() {
           drawTempValue(minTemp, 9);
         }
       }
-      if (elapsed >= 10000) { displayMode = 5; modeStart = millis(); _lastM = -1; displayTimer.forceReady(); }
+      if (elapsed >= 10000) { displayMode = 3; modeStart = millis(); _lastM = -1; displayTimer.forceReady(); }
+      break;
+
+    case 3: // 天氣圖示面板
+      if (displayTimer.isReady(1000)) {
+        Screen.clear();
+        bool useTomorrow = (currentHour >= 18 || currentHour < 6);
+        drawWeatherIcon(useTomorrow);
+      }
+      if (elapsed >= 5000) { displayMode = 5; modeStart = millis(); displayTimer.forceReady(); Screen.clear(); }
       break;
 
     case 5: // 時鐘
       drawInternalClock();
-      if (elapsed >= 60000) { displayMode = 2; modeStart = millis(); displayTimer.forceReady(); Screen.clear(); }
+      if (elapsed >= 45000) { displayMode = 2; modeStart = millis(); displayTimer.forceReady(); Screen.clear(); }
       break;
   }
 }
