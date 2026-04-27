@@ -48,22 +48,24 @@ void ForecastPlugin::fetchHAData() {
   HTTPClient http;
   
   const char* entities[] = {
-    "sensor.opencwa_xin_zhuang_qu_weather_code",
-    "sensor.opencwa_xin_zhuang_qu_feels_like_temperature",
-    "sensor.cwa_max_temp",
-    "sensor.cwa_min_temp",
-    "sensor.alpstuga_air_quality_monitor_shi_du_2",
-    "sensor.alpstuga_air_quality_monitor_pm2_5_2",
-    "sensor.alpstuga_air_quality_monitor_er_yang_hua_tan_2",
-    "sensor.tomorrow_avg_temp_trend",
-    "sensor.ming_ri_qi_wen_qu_shi",
-    "sensor.opencwa_xin_zhuang_qu_tomorrow_weather_code"
+    "sensor.opencwa_xin_zhuang_qu_weather_code",          // OpenCWA 新莊區即時天氣代碼，用於顯示天氣圖示
+    "sensor.opencwa_xin_zhuang_qu_feels_like_temperature", // OpenCWA 新莊區體感溫度
+    "sensor.opencwa_xin_zhuang_qu_uv_index",              // OpenCWA 新莊區紫外線指數
+    "sensor.cwa_max_temp",                                 // 今日最高溫（由自訂 HA 自動化/模板產生）
+    "sensor.cwa_min_temp",                                 // 今日最低溫（由自訂 HA 自動化/模板產生）
+    "sensor.alpstuga_air_quality_monitor_shi_du_2",        // 室內濕度
+    "sensor.alpstuga_air_quality_monitor_pm2_5_2",         // 室內 PM2.5 濃度
+    "sensor.alpstuga_air_quality_monitor_er_yang_hua_tan_2", // 室內 CO2 濃度
+    "sensor.tomorrow_avg_temp_trend",                      // 明日平均氣溫趨勢（可選備援）
+    "sensor.ming_ri_qi_wen_qu_shi",                        // 明日氣溫趨勢備援，當主要趨勢 sensor 不可用時使用
+    "sensor.opencwa_xin_zhuang_qu_tomorrow_weather_code"   // OpenCWA 新莊區明日天氣代碼，用於明日天氣圖示
   };
 
   bool trendUpdated = false;
   float newTrend = tomorrowTrend;
+  int entityCount = sizeof(entities) / sizeof(entities[0]);
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < entityCount; i++) {
     String url = String(haServer) + "/api/states/" + String(entities[i]);
     http.begin(client, url);
     http.addHeader("Authorization", "Bearer " + String(haToken));
@@ -77,13 +79,14 @@ void ForecastPlugin::fetchHAData() {
       if (state != "unknown" && state != "unavailable") {
         if (i == 0) weatherIcon = mapCwaCode(state.toInt());
         if (i == 1) haFeelsLike = state.toFloat();
-        if (i == 2) maxTemp = (int)roundf(state.toFloat());
-        if (i == 3) minTemp = (int)roundf(state.toFloat());
-        if (i == 4) haHumidity = state.toFloat();
-        if (i == 5) haPM25 = state.toFloat();
-        if (i == 6) haCO2 = state.toFloat();
-        if (i == 7 || i == 8) { newTrend = state.toFloat(); trendUpdated = true; }
-        if (i == 9) { tomorrowWeatherIcon = mapCwaCode(state.toInt()); hasTomorrowWeatherIcon = true; }
+        if (i == 2) haUVIndex = state.toFloat();
+        if (i == 3) maxTemp = (int)roundf(state.toFloat());
+        if (i == 4) minTemp = (int)roundf(state.toFloat());
+        if (i == 5) haHumidity = state.toFloat();
+        if (i == 6) haPM25 = state.toFloat();
+        if (i == 7) haCO2 = state.toFloat();
+        if (i == 8 || i == 9) { newTrend = state.toFloat(); trendUpdated = true; }
+        if (i == 10) { tomorrowWeatherIcon = mapCwaCode(state.toInt()); hasTomorrowWeatherIcon = true; }
         
         // 警告邏輯：PM2.5 > 35 或 CO2 > 1000
         showAQIWarning = (haPM25 > 35.0f || haCO2 > 1000.0f);
@@ -131,6 +134,18 @@ void ForecastPlugin::drawTrendOneDecimal(float value, int y) {
   }
 }
 
+void ForecastPlugin::drawUVIndex(int y) {
+  int uv = (int)roundf(haUVIndex);
+  if (uv < 0) uv = 0;
+  if (uv > 99) uv = 99;
+
+  if (uv < 10) {
+    Screen.drawNumbers(6, y, {uv});
+  } else {
+    Screen.drawNumbers(4, y, {uv / 10, uv % 10});
+  }
+}
+
 void ForecastPlugin::drawWeatherIcon(bool useTomorrow) {
   int icon = weatherIcon;
   if (useTomorrow && hasTomorrowWeatherIcon) {
@@ -138,7 +153,10 @@ void ForecastPlugin::drawWeatherIcon(bool useTomorrow) {
   }
 
   if (icon >= 0 && icon < (int)weatherIcons.size()) {
-    Screen.drawWeather(0, 5, icon, myBrightness);
+    Screen.drawWeather(0, 0, icon, myBrightness);
+    if (!useTomorrow) {
+      drawUVIndex(12);
+    }
   }
 }
 
@@ -257,8 +275,8 @@ void ForecastPlugin::loop() {
     case 3: // 天氣圖示面板
       if (displayTimer.isReady(1000)) {
         Screen.clear();
-        bool useTomorrow = (currentHour >= 18 || currentHour < 6);
-        drawWeatherIcon(useTomorrow);
+        // 日夜模式使用 cityclock web 介面儲存的 nightStart/nightEnd 設定
+        drawWeatherIcon(showNightTrend);
       }
       if (elapsed >= 5000) { displayMode = 5; modeStart = millis(); displayTimer.forceReady(); Screen.clear(); }
       break;

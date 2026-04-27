@@ -7,6 +7,7 @@
     * 整合 `OpenCWA` (中央氣象署)，即時顯示新莊區天氣圖示。
     * 顯示今日最高溫與最低溫預報，並使用自定義**向上/向下三角形**增強視覺辨識。
     * 支援「明日平均氣溫趨勢」面板（可顯示升溫/降溫/持平）。
+    * 日間天氣圖示顯示 UV，夜間改為明日天氣圖示；日夜判斷共用 cityclock Web 的 nightStart/nightEnd 設定。
 * **居家環境監測**：
     * 整合 **Alpstuga Air Quality Monitor**，顯示即時室內濕度。
     * **體感溫度**顯示 (Feels Like Temperature)。
@@ -79,14 +80,17 @@ ha_server = "http://YOUR_HA_IP:8123"
 
 如果你的 Home Assistant 實體名稱和本專案預設不同，請在 `src/plugins/ForecastPlugin.cpp` 的 `entities[]` 清單中改成你的 entity ID。預設對照如下：
 
-- `sensor.opencwa_xin_zhuang_qu_weather_code`：天氣代碼（對應天氣圖示）
-- `sensor.opencwa_xin_zhuang_qu_feels_like_temperature`：體感溫度
-- `sensor.cwa_max_temp`：最高溫（由上方 YAML 範例建立）
-- `sensor.cwa_min_temp`：最低溫（由上方 YAML 範例建立）
-- `sensor.alpstuga_air_quality_monitor_shi_du_2`：濕度
-- `sensor.alpstuga_air_quality_monitor_pm2_5_2`：PM2.5
-- `sensor.alpstuga_air_quality_monitor_er_yang_hua_tan_2`：CO2
-- `sensor.tomorrow_avg_temp_trend`：明日平均氣溫趨勢（另支援備援 ID：`sensor.ming_ri_qi_wen_qu_shi`）
+- `sensor.opencwa_xin_zhuang_qu_weather_code`：OpenCWA 新莊區即時天氣代碼，用來決定螢幕上的天氣圖示
+- `sensor.opencwa_xin_zhuang_qu_feels_like_temperature`：OpenCWA 新莊區體感溫度
+- `sensor.opencwa_xin_zhuang_qu_uv_index`：OpenCWA 新莊區紫外線指數
+- `sensor.cwa_max_temp`：今日最高溫（由上方 YAML 範例中的 HA 自動化/模板產生）
+- `sensor.cwa_min_temp`：今日最低溫（由上方 YAML 範例中的 HA 自動化/模板產生）
+- `sensor.alpstuga_air_quality_monitor_shi_du_2`：室內濕度
+- `sensor.alpstuga_air_quality_monitor_pm2_5_2`：室內 PM2.5 濃度
+- `sensor.alpstuga_air_quality_monitor_er_yang_hua_tan_2`：室內 CO2 濃度
+- `sensor.tomorrow_avg_temp_trend`：明日平均氣溫趨勢（主要趨勢來源）
+- `sensor.ming_ri_qi_wen_qu_shi`：明日氣溫趨勢備援來源，當主要趨勢 sensor 不可用時使用
+- `sensor.opencwa_xin_zhuang_qu_tomorrow_weather_code`：OpenCWA 新莊區明日天氣代碼，用來決定明日的天氣圖示
 
 ## 🌐 Web 設定頁面
 
@@ -94,7 +98,7 @@ ha_server = "http://YOUR_HA_IP:8123"
 
 - `http://<裝置IP>/cityclock`
   - 城市時鐘設定（目前僅支援台北）。
-  - 可調整夜間時段 `nightStart/nightEnd`，控制 Forecast 何時顯示「明日趨勢」。
+  - 可調整夜間時段 `nightStart/nightEnd`，控制 Forecast 夜間顯示明日趨勢與天氣圖示切換。
   - 提供「立即套用」，通常幾秒內生效。
 
 - `http://<裝置IP>/forecast`
@@ -108,7 +112,7 @@ include/plugins/ForecastPlugin.h：插件標頭檔，可在此調整 myBrightnes
 src/plugins/ForecastPlugin.cpp：核心邏輯，包含資料抓取、三角形繪製與輪播邏輯。
 
 ## 📝 版本紀錄
-v1.3 - 將趨勢箭頭改為高度 4px 正三角形，並優化天氣圖標位置。
+v1.3 - 將趨勢箭頭改為高度 4px 正三角形，並優化天氣圖標位置。新增日間天氣圖示 UV 指數顯示。
 
 v1.2 - 加入 PM2.5 與 CO2 智慧警告頁面，優化最高/最低溫箭頭視覺。
 

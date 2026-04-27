@@ -19,6 +19,7 @@ private:
   unsigned long lastFetch = 0;
   float haPM25 = 0.0f;
   float haCO2 = 0.0f;          // 新增 CO2 變數
+  float haUVIndex = 0.0f;      // 新增 UV 指數
   bool showAQIWarning = false;
   int tomorrowWeatherIcon = -1;
   bool hasTomorrowWeatherIcon = false;
@@ -42,6 +43,7 @@ private:
   void drawInternalClock();
   void drawTempValue(int temp, int y);
   void drawTrendOneDecimal(float value, int y);
+  void drawUVIndex(int y);
   void drawWeatherIcon(bool useTomorrow);
   int mapCwaCode(int code);
   void loadNightWindowConfig();
