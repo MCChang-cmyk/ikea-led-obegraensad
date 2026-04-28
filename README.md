@@ -1,12 +1,23 @@
 # IKEA OBEGRÄNSAD - 台灣新莊氣象與居家監測時鐘版
 
-這是基於 [IKEA OBEGRÄNSAD LED 燈板](https://www.ikea.com.tw/zh/products/decoration/lighting-accessories/obegransad-led-wall-lamp-black-art-10526285) 進行改裝的 ESP32 專案。本專案針對台灣使用環境進行深度在地化優化，整合 Home Assistant 與中央氣象署 (CWA) 數據，並具備居家空氣品質監測與自動警告功能。
+這是基於 IKEA OBEGRÄNSAD LED 燈板進行改裝的 ESP32 專案。基於 [IKEA OBEGRÄNSAD Hack/Mod](https://github.com/ph1p/ikea-led-obegraensad) 進行修改而來。本專案針對台灣環境進行深度在地化優化，移除獨立讀取雲端氣象資訊，調整 Home Assistant 感測器搭配中央氣象署 (CWA) 等整合數據數值顯示，並具備居家空氣品質監測與自動警告功能。
 
-<img width="1249" height="699" alt="IKEA-OBEGRÄNSAD" src="https://github.com/user-attachments/assets/05fa6a97-0b46-4946-a9e7-4723a463cfa1" />
+## 設計
+
+由於 OBEGRÄNSAD 面板只有 16x16 像素。因此在面板設計時盡可能以直覺、容易理解並區分為原則進行設計：
+
+<img width="1415" height="699" alt="IKEA-OBEGRÄNSAD" src="https://github.com/user-attachments/assets/2281e50a-bbaa-45ac-9d13-3d0ec264a0bf" />
+
+* 為避免畫面刷新頻率過度頻繁影響注意力，設計每分鐘刷新一次畫面，分為 40 秒顯示時間、10 秒顯示氣溫、10 秒顯示氣象。
+* 氣溫與天氣面板，分別顯示白天的當日即時資訊，以及晚間提供的明日預報資訊。
+* 簡化認知，晚間僅提供「明日氣溫平均值相較於今日的變化」。
+* 本日天氣即時資訊，於 sunny 至 cloudy 時顯示即時 UVI 數值，於 rainly 中顯示未來降雨機率。
+* [測試] 即時降雨機率透過氣象資料、氣象局提供濕度以及陽台濕度感應器進行計算。
 
 ## 🌟 核心功能
 * **在地化氣象顯示**：
     * 整合 `OpenCWA` (中央氣象署)，即時顯示新莊區天氣圖示。
+    * 整合 `OpenUV` ，提供最短 20 分鐘擷取一次的即時 UVI 數值資訊。
     * 顯示今日最高溫與最低溫預報，並使用自定義**向上/向下三角形**增強視覺辨識。
     * 支援「明日平均氣溫趨勢」面板（可顯示升溫/降溫/持平）。
     * 日間天氣圖示顯示 UV，使用 8x8 數字字型並上移 2px；夜間改為明日天氣圖示，日夜判斷共用 cityclock Web 的 nightStart/nightEnd 設定。
