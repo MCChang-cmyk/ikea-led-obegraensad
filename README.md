@@ -2,6 +2,8 @@
 
 這是基於 [IKEA OBEGRÄNSAD LED 燈板](https://www.ikea.com.tw/zh/products/decoration/lighting-accessories/obegransad-led-wall-lamp-black-art-10526285) 進行改裝的 ESP32 專案。本專案針對台灣使用環境進行深度在地化優化，整合 Home Assistant 與中央氣象署 (CWA) 數據，並具備居家空氣品質監測與自動警告功能。
 
+<img width="1249" height="699" alt="IKEA-OBEGRÄNSAD" src="https://github.com/user-attachments/assets/05fa6a97-0b46-4946-a9e7-4723a463cfa1" />
+
 ## 🌟 核心功能
 * **在地化氣象顯示**：
     * 整合 `OpenCWA` (中央氣象署)，即時顯示新莊區天氣圖示。
