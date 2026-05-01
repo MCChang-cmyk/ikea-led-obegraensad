@@ -1,22 +1,30 @@
 # IKEA OBEGRÄNSAD - 台灣新莊氣象與居家監測時鐘版
 
-這是基於 [IKEA OBEGRÄNSAD LED 燈板](https://www.ikea.com.tw/zh/products/decoration/lighting-accessories/obegransad-led-wall-lamp-black-art-10526285) 進行改裝的 ESP32 專案。本專案針對台灣使用環境進行深度在地化優化，整合 Home Assistant 與中央氣象署 (CWA) 數據，並具備居家空氣品質監測與自動警告功能。
+這是基於 [IKEA OBEGRÄNSAD LED 燈板](https://www.ikea.com.tw/zh/products/decoration/lighting-accessories/obegransad-led-wall-lamp-black-art-10526285) 進行改裝的 ESP32 專案。本專案針對台灣使用環境進行深度在地化優化，利用 Home Assistant 整合各種感測器、OpenUV 與中央氣象署 (CWA) 等整合數據進行資訊顯示，並具備居家空氣品質監測與自動警告功能。
+
+## 🖼 畫面顯示範例
+
+本面板除了時鐘面板以外，另外設計了氣溫與天氣面板，使三種面板自動輪撥切換。並且設計了日間模式與夜間模式，以符合日常生活的資訊需求：
+
+### ☀ 日間模式 (Day Mode)
+
+![日間模式範例](images/IKEA-OBEGRÄNSAD-readme-pattern-day.jpg)
+
+日間模式會顯示當天的最高溫與最低溫預報，並且在即時天氣圖示中，根據當時的天氣預報改變顯示數值，當為晴天、晴時多雨時，數字顯示紫外線指數。而當天氣為雷、雨天或陰雨天，且降雨機率高於 30％ 時，顯示降雨機率。
+
+### 🌙 夜間模式 (Night Mode)
+
+![夜間模式範例](images/IKEA-OBEGRÄNSAD-readme-pattern-night.jpg)
+
+夜間模式僅顯示今明兩天氣溫平均值的差異以及明日天氣預報圖示。
+
 
 ## 🌟 核心功能
 * **在地化氣象顯示**：
     * 整合 `OpenCWA` (中央氣象署)，即時顯示新莊區天氣圖示。
     * 顯示今日最高溫與最低溫預報，並使用自定義**向上/向下三角形**增強視覺辨識。
     * 支援「明日平均氣溫趨勢」面板（可顯示升溫/降溫/持平）。
-    * 日間天氣圖示顯示 UV，使用 8x8 數字字型並上移 2px；夜間改為明日天氣圖示，日夜判斷共用 cityclock Web 的 nightStart/nightEnd 設定。
-* **居家環境監測**：
-    * 整合 **Alpstuga Air Quality Monitor**，顯示即時室內濕度。
-    * **體感溫度**顯示 (Feels Like Temperature)。
-* **智慧空氣品質警告 (AQI/CO2)**：
-    * 當 **PM2.5 > 35 μg/m³** 或 **CO2 > 1000 ppm** 時，自動切換至驚嘆號 `[!]` 警告畫面並顯示數值。
-* **視覺優化**：
-    * **統一亮度管理**：所有面板均可透過變數統一調光。
-    * **時鐘亮度補償**：針對細線條時鐘字體進行視覺補償，避免看起來比圖示暗。
-* **新版輪播節奏**：
+* **輪播節奏**：
     * **時鐘**顯示 46 秒 (0-45秒)。
     * **溫度面板**顯示 7 秒 (46-52秒)：
         * 白天顯示今日高/低溫。
