@@ -23,7 +23,7 @@ private:
   bool showAQIWarning = false;
   int tomorrowWeatherIcon = -1;
   bool hasTomorrowWeatherIcon = false;
-  int haPrecipitationChance = -1; // 新增降雨機率變數
+  float haRainProb = 0.0f;     // 新增降雨機率
   
   // 顯示控制
   int displayMode = 1;
@@ -45,6 +45,7 @@ private:
   void drawTempValue(int temp, int y);
   void drawTrendOneDecimal(float value, int y);
   void drawUVIndex(int y);
+  void drawRainProb(int y);
   void drawWeatherIcon(bool useTomorrow);
   int mapCwaCode(int code);
   void loadNightWindowConfig();

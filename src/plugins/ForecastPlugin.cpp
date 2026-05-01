@@ -48,23 +48,25 @@ void ForecastPlugin::fetchHAData() {
   HTTPClient http;
   
   const char* entities[] = {
-    "sensor.opencwa_xin_zhuang_qu_weather_code",           // 當天天氣狀況代碼 (用於天氣圖標)
-    "sensor.opencwa_xin_zhuang_qu_feels_like_temperature", // 當日體感溫度
-    "sensor.cwa_max_temp",                                 // 當日最高溫度
-    "sensor.cwa_min_temp",                                 // 當日最低溫度
+    "sensor.opencwa_xin_zhuang_qu_weather_code",           // OpenCWA 新莊區即時天氣代碼，用於顯示天氣圖示
+    "sensor.opencwa_xin_zhuang_qu_feels_like_temperature", // OpenCWA 新莊區體感溫度
+    "sensor.openuv_current_uv_index",                      // OpenUV 紫外線指數
+    "sensor.cwa_max_temp",                                 // 今日最高溫（由自訂 HA 自動化/模板產生）
+    "sensor.cwa_min_temp",                                 // 今日最低溫（由自訂 HA 自動化/模板產生）
     "sensor.alpstuga_air_quality_monitor_shi_du_2",        // 室內濕度
-    "sensor.alpstuga_air_quality_monitor_pm2_5_2",         // 室內PM2.5濃度
-    "sensor.alpstuga_air_quality_monitor_er_yang_hua_tan_2", // 室內二氧化碳濃度
-    "sensor.tomorrow_avg_temp_trend",                      // 明天平均溫度趨勢
-    "sensor.ming_ri_qi_wen_qu_shi",                        // 明天氣溫趨勢 (備用)
-    "sensor.opencwa_xin_zhuang_qu_tomorrow_weather_code",  // 明天天氣狀況代碼
-    "sensor.xin_zhuang_wei_lai_san_xiao_shi_jiang_yu_ji_lu" // 未來三小時降雨機率
+    "sensor.alpstuga_air_quality_monitor_pm2_5_2",         // 室內 PM2.5 濃度
+    "sensor.alpstuga_air_quality_monitor_er_yang_hua_tan_2", // 室內 CO2 濃度
+    "sensor.tomorrow_avg_temp_trend",                      // 明日平均氣溫趨勢（可選備援）
+    "sensor.ming_ri_qi_wen_qu_shi",                        // 明日氣溫趨勢備援，當主要趨勢 sensor 不可用時使用
+    "sensor.opencwa_xin_zhuang_qu_tomorrow_weather_code"  // OpenCWA 新莊區明日天氣代碼，用於明日天氣圖示
+    "sensor.xin_zhuang_ji_shi_jiang_yu_ji_lu"              //新莊即時降雨機率  
   };
 
   bool trendUpdated = false;
   float newTrend = tomorrowTrend;
+  int entityCount = sizeof(entities) / sizeof(entities[0]);
 
-  for (int i = 0; i < 11; i++) {
+  for (int i = 0; i < entityCount; i++) {
     String url = String(haServer) + "/api/states/" + String(entities[i]);
     http.begin(client, url);
     http.addHeader("Authorization", "Bearer " + String(haToken));
@@ -78,14 +80,15 @@ void ForecastPlugin::fetchHAData() {
       if (state != "unknown" && state != "unavailable") {
         if (i == 0) weatherIcon = mapCwaCode(state.toInt());
         if (i == 1) haFeelsLike = state.toFloat();
-        if (i == 2) maxTemp = (int)roundf(state.toFloat());
-        if (i == 3) minTemp = (int)roundf(state.toFloat());
-        if (i == 4) haHumidity = state.toFloat();
-        if (i == 5) haPM25 = state.toFloat();
-        if (i == 6) haCO2 = state.toFloat();
-        if (i == 7 || i == 8) { newTrend = state.toFloat(); trendUpdated = true; }
-        if (i == 9) { tomorrowWeatherIcon = mapCwaCode(state.toInt()); hasTomorrowWeatherIcon = true; }
-        if (i == 10) haPrecipitationChance = state.toInt();
+        if (i == 2) haUVIndex = state.toFloat();
+        if (i == 3) maxTemp = (int)roundf(state.toFloat());
+        if (i == 4) minTemp = (int)roundf(state.toFloat());
+        if (i == 5) haHumidity = state.toFloat();
+        if (i == 6) haPM25 = state.toFloat();
+        if (i == 7) haCO2 = state.toFloat();
+        if (i == 8 || i == 9) { newTrend = state.toFloat(); trendUpdated = true; }
+        if (i == 10) { tomorrowWeatherIcon = mapCwaCode(state.toInt()); hasTomorrowWeatherIcon = true; }
+        if (i == 11) haRainProb = state.toFloat();
         
         // 警告邏輯：PM2.5 > 35 或 CO2 > 1000
         showAQIWarning = (haPM25 > 35.0f || haCO2 > 1000.0f);
@@ -133,6 +136,32 @@ void ForecastPlugin::drawTrendOneDecimal(float value, int y) {
   }
 }
 
+void ForecastPlugin::drawUVIndex(int y) {
+  int uv = (int)roundf(haUVIndex);
+  if (uv < 0) uv = 0;
+  if (uv > 99) uv = 99;
+
+  if (uv < 10) {
+    Screen.drawCharacter(4, y, Screen.readBytes(fonts[1].data[uv]), 8, myBrightness);
+  } else {
+    Screen.drawCharacter(0, y, Screen.readBytes(fonts[1].data[uv / 10]), 8, myBrightness);
+    Screen.drawCharacter(8, y, Screen.readBytes(fonts[1].data[uv % 10]), 8, myBrightness);
+  }
+}
+
+void ForecastPlugin::drawRainProb(int y) {
+  int prob = (int)roundf(haRainProb);
+  if (prob < 0) prob = 0;
+  if (prob > 99) prob = 99;
+
+  if (prob < 10) {
+    Screen.drawCharacter(4, y, Screen.readBytes(fonts[1].data[prob]), 8, myBrightness);
+  } else {
+    Screen.drawCharacter(0, y, Screen.readBytes(fonts[1].data[prob / 10]), 8, myBrightness);
+    Screen.drawCharacter(8, y, Screen.readBytes(fonts[1].data[prob % 10]), 8, myBrightness);
+  }
+}
+
 void ForecastPlugin::drawWeatherIcon(bool useTomorrow) {
   int icon = weatherIcon;
   if (useTomorrow && hasTomorrowWeatherIcon) {
@@ -140,7 +169,15 @@ void ForecastPlugin::drawWeatherIcon(bool useTomorrow) {
   }
 
   if (icon >= 0 && icon < (int)weatherIcons.size()) {
-    Screen.drawWeather(0, 6, icon, myBrightness);
+    int iconY = useTomorrow ? 5 : 0;
+    Screen.drawWeather(0, iconY, icon, myBrightness);
+    if (!useTomorrow) {
+      if ((icon == 0 || icon == 4 || icon == 1) && haRainProb > 30.0f) {
+        drawRainProb(8);
+      } else {
+        drawUVIndex(8);
+      }
+    }
   }
 }
 
@@ -179,16 +216,20 @@ void ForecastPlugin::loop() {
     lastNightConfigLoad = millis();
   }
 
-  unsigned long elapsed = millis() - modeStart;
-  int currentHour = _internalTime.tm_hour;
+  // 獲取當前秒數，基於整分鐘的秒數決定顯示模式
+  int currentSec = 0;
+  int currentHour = 0;
   if (getLocalTime(&_internalTime)) {
+    currentSec = _internalTime.tm_sec;
     currentHour = _internalTime.tm_hour;
   } else {
     time_t now = time(nullptr);
     struct tm fallbackTime;
     localtime_r(&now, &fallbackTime);
+    currentSec = fallbackTime.tm_sec;
     currentHour = fallbackTime.tm_hour;
   }
+
   bool showNightTrend = false;
   if (nightStartHour == nightEndHour) {
     showNightTrend = (currentHour == nightStartHour);
@@ -198,13 +239,21 @@ void ForecastPlugin::loop() {
     showNightTrend = (currentHour >= nightStartHour || currentHour <= nightEndHour);
   }
 
+  // 根據秒數設置顯示模式
+  if (currentSec < 40) {
+    displayMode = 5; // 時鐘 (0-39 秒)
+  } else if (currentSec < 50) {
+    displayMode = 2; // 溫度面板 (40-49 秒)
+  } else {
+    displayMode = 3; // 天氣圖示面板 (50-59 秒)
+  }
+
   switch (displayMode) {
     case 2: // 溫度面板：白天高低溫、晚間明日趨勢
       if (displayTimer.isReady(1000)) {
         static unsigned long lastDebugPrint = 0;
         if (millis() - lastDebugPrint > 30000UL) {
-          Serial.printf("[ForecastPlugin] hour=%d night=%d range=%d~%d hasTrend=%d trend=%.1f\n",
-                        currentHour, showNightTrend, nightStartHour, nightEndHour, hasTomorrowTrend, tomorrowTrend);
+          Serial.printf("[ForecastPlugin] sec=%d displayMode=%d\n", currentSec, displayMode);
           lastDebugPrint = millis();
         }
         Screen.clear();
@@ -241,33 +290,40 @@ void ForecastPlugin::loop() {
             drawTrendOneDecimal(tomorrowTrend, 8);
           }
         } else {
-          // 白天顯示今日高低溫
-          Screen.setPixel(2, 1, 1, myBrightness);
-          Screen.setPixel(1, 2, 1, myBrightness); Screen.setPixel(2, 2, 1, myBrightness); Screen.setPixel(3, 2, 1, myBrightness);
-          Screen.setPixel(2, 3, 1, myBrightness); Screen.setPixel(2, 4, 1, myBrightness);
-          drawTempValue(maxTemp, 2);
+          // ==========================================
+          // 白天顯示：今日高低溫 (位置微調)
+          // ==========================================
+          
+          // --- 上方：最高溫圖示 (向上實心三角形，位置下移 1px) ---
+          // 頂點 (2,2), 底邊 (0,4) 到 (4,4)
+          Screen.setPixel(2, 2, 1, myBrightness); 
+          Screen.setPixel(1, 3, 1, myBrightness); Screen.setPixel(2, 3, 1, myBrightness); Screen.setPixel(3, 3, 1, myBrightness);
+          Screen.setPixel(0, 4, 1, myBrightness); Screen.setPixel(1, 4, 1, myBrightness); Screen.setPixel(2, 4, 1, myBrightness); Screen.setPixel(3, 4, 1, myBrightness); Screen.setPixel(4, 4, 1, myBrightness);
+          
+          // 數值座標也同步微調，確保與三角形間距適中
+          drawTempValue(maxTemp, 2); 
 
-          Screen.setPixel(2, 9, 1, myBrightness); Screen.setPixel(2, 10, 1, myBrightness);
-          Screen.setPixel(1, 11, 1, myBrightness); Screen.setPixel(2, 11, 1, myBrightness); Screen.setPixel(3, 11, 1, myBrightness);
-          Screen.setPixel(2, 12, 1, myBrightness);
-          drawTempValue(minTemp, 9);
+          // --- 下方：最低溫圖示 (向下實心三角形) ---
+          // 位置保持不變，維持與上方的對稱感
+          Screen.setPixel(0, 11, 1, myBrightness); Screen.setPixel(1, 11, 1, myBrightness); Screen.setPixel(2, 11, 1, myBrightness); Screen.setPixel(3, 11, 1, myBrightness); Screen.setPixel(4, 11, 1, myBrightness);
+          Screen.setPixel(1, 12, 1, myBrightness); Screen.setPixel(2, 12, 1, myBrightness); Screen.setPixel(3, 12, 1, myBrightness);
+          Screen.setPixel(2, 13, 1, myBrightness);
+          
+          drawTempValue(minTemp, 10); 
         }
       }
-      if (elapsed >= 10000) { displayMode = 3; modeStart = millis(); _lastM = -1; displayTimer.forceReady(); }
       break;
 
     case 3: // 天氣圖示面板
       if (displayTimer.isReady(1000)) {
         Screen.clear();
-        bool useTomorrow = (currentHour >= 18 || currentHour < 6);
-        drawWeatherIcon(useTomorrow);
+        // 日夜模式使用 cityclock web 介面儲存的 nightStart/nightEnd 設定
+        drawWeatherIcon(showNightTrend);
       }
-      if (elapsed >= 5000) { displayMode = 5; modeStart = millis(); displayTimer.forceReady(); Screen.clear(); }
       break;
 
     case 5: // 時鐘
       drawInternalClock();
-      if (elapsed >= 45000) { displayMode = 2; modeStart = millis(); displayTimer.forceReady(); Screen.clear(); }
       break;
   }
 }

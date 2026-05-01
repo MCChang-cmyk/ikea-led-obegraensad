@@ -31,13 +31,10 @@
 #include "plugins/CometPlugin.h"
 #include "plugins/DDPPlugin.h"
 #include "plugins/DrawPlugin.h"
-#include "plugins/FirefliesPlugin.h"
 #include "plugins/FireworkPlugin.h"
-#include "plugins/GameOfLifePlugin.h"
 #include "plugins/LinesPlugin.h"
 #include "plugins/MatrixRainPlugin.h"
 #include "plugins/MeteorShowerPlugin.h"
-#include "plugins/PongClockPlugin.h"
 #include "plugins/RadarPlugin.h"
 #include "plugins/RainPlugin.h"
 #include "plugins/ScanlinesPlugin.h"
@@ -46,30 +43,10 @@
 #include "plugins/SpiralPlugin.h"
 #include "plugins/StarsPlugin.h"
 #include "plugins/TickingClockPlugin.h"
-#include "plugins/TetrisPlugin.h"
 #include "plugins/WaveBarsPlugin.h"
 #include "plugins/WavePlugin.h"
 
-// New animation plugins
-#include "plugins/PlasmaPlugin.h"
-#include "plugins/PerlinNoisePlugin.h"
-#include "plugins/DropletPlugin.h"
-#include "plugins/FlockingPlugin.h"
-#include "plugins/SandPlugin.h"
-#include "plugins/MazePlugin.h"
-#include "plugins/HeartbeatPlugin.h"
-#include "plugins/LavaLampPlugin.h"
-#include "plugins/RotatingCubePlugin.h"
-#include "plugins/SpectrumPlugin.h"
-#include "plugins/DNAHelixPlugin.h"
-#include "plugins/MarqueePlugin.h"
 
-#include "plugins/MarioPlugin.h"
-#include "plugins/BatmanPlugin.h"
-#include "plugins/GoosePlugin.h"
-#include "plugins/MortalKombatPlugin.h"
-#include "plugins/CatPlugin.h"
-#include "plugins/DinoPlugin.h"
 
 #ifdef ENABLE_SERVER
 #include "plugins/AnimationPlugin.h"
@@ -252,12 +229,10 @@ void baseSetup()
   pluginManager.addPlugin(new BreakoutPlugin());
   pluginManager.addPlugin(new BigClockPlugin());
   pluginManager.addPlugin(new SnakePlugin());
-  pluginManager.addPlugin(new GameOfLifePlugin());
   pluginManager.addPlugin(new StarsPlugin());
   pluginManager.addPlugin(new LinesPlugin());
   pluginManager.addPlugin(new CirclePlugin());
   pluginManager.addPlugin(new ClockPlugin());
-  pluginManager.addPlugin(new PongClockPlugin());
   pluginManager.addPlugin(new TickingClockPlugin());
   pluginManager.addPlugin(new RainPlugin());
   pluginManager.addPlugin(new MatrixRainPlugin());
@@ -269,32 +244,10 @@ void baseSetup()
   pluginManager.addPlugin(new RadarPlugin());
   pluginManager.addPlugin(new BubblesPlugin());
   pluginManager.addPlugin(new CometPlugin());
-  pluginManager.addPlugin(new FirefliesPlugin());
   pluginManager.addPlugin(new MeteorShowerPlugin());
   pluginManager.addPlugin(new ScanlinesPlugin());
   pluginManager.addPlugin(new SparkleFieldPlugin());
   pluginManager.addPlugin(new WaveBarsPlugin());
-
-  // New animation plugins
-  pluginManager.addPlugin(new PlasmaPlugin());
-  pluginManager.addPlugin(new PerlinNoisePlugin());
-  pluginManager.addPlugin(new DropletPlugin());
-  pluginManager.addPlugin(new FlockingPlugin());
-  pluginManager.addPlugin(new SandPlugin());
-  pluginManager.addPlugin(new MazePlugin());
-  pluginManager.addPlugin(new HeartbeatPlugin());
-  pluginManager.addPlugin(new LavaLampPlugin());
-  pluginManager.addPlugin(new RotatingCubePlugin());
-  pluginManager.addPlugin(new SpectrumPlugin());
-  pluginManager.addPlugin(new DNAHelixPlugin());
-  pluginManager.addPlugin(new TetrisPlugin());
-  pluginManager.addPlugin(new MarqueePlugin());
-  pluginManager.addPlugin(new MarioPlugin());
-  pluginManager.addPlugin(new BatmanPlugin());
-  pluginManager.addPlugin(new GoosePlugin());
-  pluginManager.addPlugin(new MortalKombatPlugin());
-  pluginManager.addPlugin(new CatPlugin());
-  pluginManager.addPlugin(new DinoPlugin());
 
 #ifdef ENABLE_SERVER
   // pluginManager.addPlugin(new WeatherPlugin());
