@@ -128,8 +128,8 @@ void ForecastPlugin::drawTrendOneDecimal(float value, int y) {
   if (rounded > 99) rounded = 99; // guard for screen width
 
   if (rounded < 10) {
-    // Display single digit, shifted left for better alignment with arrows
-    Screen.drawCharacter(1, y, Screen.readBytes(fonts[1].data[rounded]), 8, myBrightness);
+    // Display single digit, centered (x=5)
+    Screen.drawCharacter(5, y, Screen.readBytes(fonts[1].data[rounded]), 8, myBrightness);
   } else {
     // Display two digits (rare case)
     Screen.drawNumbers(0, y, {rounded / 10, rounded % 10});
@@ -142,10 +142,11 @@ void ForecastPlugin::drawUVIndex(int y) {
   if (uv > 99) uv = 99;
 
   if (uv < 10) {
-    Screen.drawCharacter(4, y, Screen.readBytes(fonts[1].data[uv]), 8, myBrightness);
+    // Display single digit, centered (x=5)
+    Screen.drawCharacter(5, y, Screen.readBytes(fonts[1].data[uv]), 8, myBrightness);
   } else {
-    Screen.drawCharacter(0, y, Screen.readBytes(fonts[1].data[uv / 10]), 8, myBrightness);
-    Screen.drawCharacter(8, y, Screen.readBytes(fonts[1].data[uv % 10]), 8, myBrightness);
+    Screen.drawCharacter(2, y, Screen.readBytes(fonts[1].data[uv / 10]), 8, myBrightness);
+    Screen.drawCharacter(9, y, Screen.readBytes(fonts[1].data[uv % 10]), 8, myBrightness);
   }
 }
 
@@ -155,10 +156,11 @@ void ForecastPlugin::drawRainProb(int y) {
   if (prob > 99) prob = 99;
 
   if (prob < 10) {
-    Screen.drawCharacter(4, y, Screen.readBytes(fonts[1].data[prob]), 8, myBrightness);
+    // Display single digit, centered (x=5)
+    Screen.drawCharacter(5, y, Screen.readBytes(fonts[1].data[prob]), 8, myBrightness);
   } else {
-    Screen.drawCharacter(0, y, Screen.readBytes(fonts[1].data[prob / 10]), 8, myBrightness);
-    Screen.drawCharacter(8, y, Screen.readBytes(fonts[1].data[prob % 10]), 8, myBrightness);
+    Screen.drawCharacter(2, y, Screen.readBytes(fonts[1].data[prob / 10]), 8, myBrightness);
+    Screen.drawCharacter(9, y, Screen.readBytes(fonts[1].data[prob % 10]), 8, myBrightness);
   }
 }
 
