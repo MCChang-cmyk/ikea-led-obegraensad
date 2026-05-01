@@ -129,7 +129,7 @@ void ForecastPlugin::drawTrendOneDecimal(float value, int y) {
 
   if (rounded < 10) {
     // Display single digit, shifted left for better alignment with arrows
-    Screen.drawCharacter(1, y, Screen.readBytes(bigNumbers[rounded]), 8, myBrightness);
+    Screen.drawCharacter(1, y, Screen.readBytes(fonts[1].data[rounded]), 8, myBrightness);
   } else {
     // Display two digits (rare case)
     Screen.drawNumbers(0, y, {rounded / 10, rounded % 10});
@@ -240,12 +240,12 @@ void ForecastPlugin::loop() {
   }
 
   // 根據秒數設置顯示模式
-  if (currentSec < 40) {
-    displayMode = 5; // 時鐘 (0-39 秒)
-  } else if (currentSec < 50) {
-    displayMode = 2; // 溫度面板 (40-49 秒)
+  if (currentSec < 46) {
+    displayMode = 5; // 時鐘 (0-45 秒)
+  } else if (currentSec < 53) {
+    displayMode = 2; // 溫度面板 (46-52 秒)
   } else {
-    displayMode = 3; // 天氣圖示面板 (50-59 秒)
+    displayMode = 3; // 天氣圖示面板 (53-59 秒)
   }
 
   switch (displayMode) {
