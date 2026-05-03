@@ -1,5 +1,7 @@
 # IKEA OBEGRÄNSAD - 台灣新莊氣象與居家監測時鐘版
 
+![預覽圖](images/IKEA-OBEGRÄNSAD-picture.jpg)
+
 這是基於 [IKEA OBEGRÄNSAD LED 燈板](https://www.ikea.com.tw/zh/products/decoration/lighting-accessories/obegransad-led-wall-lamp-black-art-10526285) 進行改裝的 ESP32 專案。本專案針對台灣使用環境進行深度在地化優化，利用 Home Assistant 整合各種感測器、OpenUV 與中央氣象署 (CWA) 等整合數據進行資訊顯示，並具備居家空氣品質監測與自動警告功能。
 
 ## 🖼 畫面顯示範例
@@ -162,9 +164,6 @@ ha_server = "http://YOUR_HA_IP:8123"
 - ``sensor.openuv_current_uv_index`：OpenUV 紫外線指數
 - `sensor.cwa_max_temp`：今日最高溫（由上方 YAML 範例中的 HA 自動化/模板產生）
 - `sensor.cwa_min_temp`：今日最低溫（由上方 YAML 範例中的 HA 自動化/模板產生）
-- `sensor.alpstuga_air_quality_monitor_shi_du_2`：室內濕度
-- `sensor.alpstuga_air_quality_monitor_pm2_5_2`：室內 PM2.5 濃度
-- `sensor.alpstuga_air_quality_monitor_er_yang_hua_tan_2`：室內 CO2 濃度
 - `sensor.tomorrow_avg_temp_trend`：明日平均氣溫趨勢（主要趨勢來源）
 - `sensor.ming_ri_qi_wen_qu_shi`：明日氣溫趨勢備援來源，當主要趨勢 sensor 不可用時使用
 
