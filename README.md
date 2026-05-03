@@ -1,8 +1,8 @@
-# IKEA OBEGRÄNSAD - 台灣新莊氣象與居家監測時鐘版
+# IKEA OBEGRÄNSAD - Home Assistant 氣象監測時鐘版
 
 ![預覽圖](images/IKEA-OBEGRÄNSAD-picture.jpg)
 
-這是基於 [IKEA OBEGRÄNSAD LED 燈板](https://www.ikea.com.tw/zh/products/decoration/lighting-accessories/obegransad-led-wall-lamp-black-art-10526285) 進行改裝的 ESP32 專案。本專案針對台灣使用環境進行深度在地化優化，利用 Home Assistant 整合各種感測器、OpenUV 與中央氣象署 (CWA) 等整合數據進行資訊顯示，並具備居家空氣品質監測與自動警告功能。
+這是基於 [IKEA OBEGRÄNSAD LED 燈板](https://www.ikea.com.hk/zh/products/luminaires/wall-lamps-and-wall-spotlights/obegransad-art-80526254) 進行改裝的 ESP32 專案。本專案針對個人使用環境進行深度在地化優化，利用 Home Assistant 整合各種感測器、OpenUV 與中央氣象署 (CWA) 等整合數據進行資訊顯示。
 
 ## 🖼 畫面顯示範例
 
@@ -36,6 +36,7 @@
     * **天氣圖示面板**顯示 7 秒 (53-59秒)：
         * 白天顯示當前天氣圖示與 UV 指數（或降雨機率）。
         * 夜間顯示明日天氣預報圖示。
+        * （測試中）即時降雨機率透過 `OpenCWA` 雲端資訊資訊與本地濕度感應器進行比對計算修正預測值。        
 
 ## 🛠 硬體需求
 * **IKEA OBEGRÄNSAD** LED 點陣燈板 (16x16)。
@@ -185,12 +186,12 @@ ha_server = "http://YOUR_HA_IP:8123"
 * `src/plugins/HAForecastClockPlugin.cpp`：核心實作，包含 HA 資料抓取、圖形繪製與時間輪播邏輯。
 
 ## 📝 版本紀錄
-v1.4 - 調整輪播節奏（46s/7s/7s），統一所有面板數字字型為系統內建字型 (`fonts[1]`) 以維持視覺一致性，優化降雨機率與 UV 指數切換邏輯。
+v1.4 - 調整輪播節奏（46s/7s/7s），統一所有面板數字字型為系統內建字型 (`fonts[1]`) 以維持視覺一致性，優化降雨機率邏輯與 UV 指數切換邏輯。
 
 v1.3 - 將趨勢箭頭改為高度 4px 正三角形，並優化天氣圖標位置。新增 OpenUV 整合數據顯示。
 
 v1.2 - 加入日夜區分畫面，優化最高/最低溫箭頭視覺。
 
-v1.1 - 加入客廳濕度感測器整合，修正不同頁面亮度問題。
+v1.1 - 加入個人濕度感測器整合，修正不同頁面亮度問題。
 
-v1.0 - 移除原本對於 Open-Meteo 的依賴，整合 Home Assistant 本地數據，完成基礎輪播架構。
+v1.0 - 移除原始專案透過 ESP32 直接擷取雲端資訊（Open-Meteo）的依賴，整合 Home Assistant 本地數據，完成基礎輪播架構。
