@@ -154,9 +154,10 @@ ha_server = "http://YOUR_HA_IP:8123"
 
 如果你的 Home Assistant 實體名稱和本專案預設不同，請在 `src/plugins/HAForecastClockPlugin.cpp` 的 `entities[]` 清單中改成你的 entity ID。預設對照如下：
 
-- `sensor.opencwa_xin_zhuang_qu_weather_code`：OpenCWA 新莊區即時天氣代碼，用來決定螢幕上的天氣圖示
+- `sensor.opencwa_xin_zhuang_qu_weather_code`：OpenCWA 新莊區即時天氣代碼，用來決定天氣圖示
+- `sensor.opencwa_xin_zhuang_qu_tomorrow_weather_code`：OpenCWA 新莊區明日天氣代碼，用來決定明日的天氣圖示
 - `sensor.opencwa_xin_zhuang_qu_feels_like_temperature`：OpenCWA 新莊區體感溫度
-- `sensor.opencwa_xin_zhuang_qu_uv_index`：OpenCWA 新莊區紫外線指數
+- ``sensor.openuv_current_uv_index`：OpenUV 紫外線指數
 - `sensor.cwa_max_temp`：今日最高溫（由上方 YAML 範例中的 HA 自動化/模板產生）
 - `sensor.cwa_min_temp`：今日最低溫（由上方 YAML 範例中的 HA 自動化/模板產生）
 - `sensor.alpstuga_air_quality_monitor_shi_du_2`：室內濕度
@@ -164,7 +165,6 @@ ha_server = "http://YOUR_HA_IP:8123"
 - `sensor.alpstuga_air_quality_monitor_er_yang_hua_tan_2`：室內 CO2 濃度
 - `sensor.tomorrow_avg_temp_trend`：明日平均氣溫趨勢（主要趨勢來源）
 - `sensor.ming_ri_qi_wen_qu_shi`：明日氣溫趨勢備援來源，當主要趨勢 sensor 不可用時使用
-- `sensor.opencwa_xin_zhuang_qu_tomorrow_weather_code`：OpenCWA 新莊區明日天氣代碼，用來決定明日的天氣圖示
 
 ## 🌐 Web 設定頁面
 
