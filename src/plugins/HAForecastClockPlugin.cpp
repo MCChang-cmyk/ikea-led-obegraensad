@@ -20,12 +20,10 @@ const char* haToken  = HA_TOKEN;
 // CWA 天氣代碼轉換
 // ==========================================
 int HAForecastClockPlugin::mapCwaCode(int code) {
-  if (code == 1) return 2;             // 晴
-  if (code >= 2 && code <= 3) return 3; // 多雲
-  if (code >= 4 && code <= 7) return 0; // 陰
-  if (code >= 8 && code <= 22) return 4;// 雨
-  if (code >= 23 && code <= 24) return 5; // 強風
-  return 1; // 其他預設為雷雨
+  // Home Assistant 傳入的編碼 (0-7) 已經與 weatherIcons 陣列的索引一致，直接回傳
+  // 0: 陰天, 1: 雷雨, 2: 晴天, 3: 多雲, 4: 下雨, 5: 下雪, 6: 霧, 7: 晴朗夜晚
+  if (code < 0 || code > 7) return 0; // 邊界檢查，超出範圍預設為陰天
+  return code;
 }
 
 void HAForecastClockPlugin::loadNightWindowConfig() {
