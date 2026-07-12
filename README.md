@@ -210,6 +210,8 @@ ha_server = "http://YOUR_HA_IP:8123"
 
 ## 📝 版本紀錄
 
+v1.6.0 - 移除部分動畫面板，新增 `HAInhouseCO2` Plugin，用以顯示室內 CO2 警報數值。當 CO2 超過 1000 時增加閃爍警示功能，並移除數值間的分隔線。
+
 v1.5.2 - 全面更替資訊來源為 Google Weather 作為資訊來源。
 
 v1.5.1 - 新增 Google Weather 作為資訊來源，優化資訊顯示正確度。
